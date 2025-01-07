@@ -1,30 +1,130 @@
 import "package:flutter/material.dart";
 import "package:flutter_svg/flutter_svg.dart";
 import "package:real_project/models/category_model.dart";
+import "package:real_project/models/diet_model.dart";
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
 
   List<CategoryModel> categories = [];
+  List<DietModel> diets = [];
 
-  void _getCategories() {
+  void _getInitialInfo() {
     categories = CategoryModel.getCategories();
+    diets = DietModel.getDiets();
   }
 
   @override
   Widget build(BuildContext context) {
-    _getCategories();
+    _getInitialInfo();
     return Scaffold(
       appBar: appBar(),
       backgroundColor: Colors.white,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      body: ListView(
         children: [
           _searchField(),
-          SizedBox(height: 40),
+          SizedBox(height: 10),
           _categoriesSection(),
+          SizedBox(height: 40),
+          _dietSection(),
         ],
       ),
+    );
+  }
+
+  Column _dietSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 20.0),
+          child: Text(
+            'Recommendation\nfor Diet',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        SizedBox(height: 15),
+        Container(
+          height: 240,
+          child: ListView.separated(
+            itemBuilder: (context, index) {
+              return Container(
+                width: 210,
+                decoration: BoxDecoration(
+                  color: diets[index].boxColor.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    SvgPicture.asset(diets[index].iconPath),
+                    Text(
+                      diets[index].name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Text(
+                      diets[index].level +
+                          ' | ' +
+                          diets[index].duration +
+                          ' | ' +
+                          diets[index].calorie,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    Container(
+                      height: 45,
+                      width: 130,
+                      child: Center(
+                        child: Text(
+                          'View',
+                          style: TextStyle(
+                            color: diets[index].viewIsSelected
+                                ? Colors.white60
+                                : Colors.purple,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        gradient: LinearGradient(
+                          colors: [
+                            diets[index].viewIsSelected
+                                ? Colors.purple
+                                : Colors.transparent,
+                            diets[index].viewIsSelected
+                                ? Colors.purpleAccent
+                                : Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              );
+            },
+            separatorBuilder: (context, index) => SizedBox(width: 25),
+            itemCount: diets.length,
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+            ),
+          ),
+        )
+      ],
     );
   }
 
